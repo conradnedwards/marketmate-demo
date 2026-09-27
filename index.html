@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MarketMate Demo — Craft Fair Command Centre</title>
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data:; connect-src 'none'; img-src 'self' data:; media-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<style>
+:root{
+  --bg:#f3efe7;--panel:#fffdf9;--panel2:#f8f4ed;--ink:#20251f;--muted:#70776f;--muted2:#91968e;
+  --line:#dfd9ce;--forest:#173c31;--forest2:#235346;--forest3:#315f52;--accent:#bd7049;--gold:#c99a52;
+  --good:#2e7857;--warn:#a96f22;--bad:#ad4b4b;--soft:#ece6dc;--shadow:0 10px 30px rgba(48,45,37,.075);
+  --shadow-lg:0 24px 70px rgba(35,35,30,.18);--radius:16px;--radius-sm:10px
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(189,112,73,.25);outline-offset:2px}
+.app{display:grid;grid-template-columns:256px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--forest);color:#fff;padding:22px 16px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;z-index:20}
+.brand{font-weight:850;font-size:25px;margin:0 8px 6px;letter-spacing:-.04em}.brand small{display:block;font-size:9px;font-weight:750;letter-spacing:.16em;opacity:.63;margin-top:5px}
+.shopname{margin:8px 8px 18px;padding:10px 11px;border:1px solid rgba(255,255,255,.12);border-radius:11px;background:rgba(255,255,255,.055);font-size:12px;color:#d9e5df;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav{display:grid;gap:3px}.nav button{border:0;background:transparent;color:#dce6e1;text-align:left;padding:10px 11px;border-radius:10px;display:flex;gap:10px;align-items:center;font-weight:580}.nav button .ico{width:18px;text-align:center;opacity:.86}.nav button:hover{background:rgba(255,255,255,.075);color:#fff}.nav button.active{background:#fff;color:var(--forest);box-shadow:0 4px 14px rgba(0,0,0,.12)}.nav .sep{height:1px;background:rgba(255,255,255,.13);margin:8px 8px}
+.sidefoot{margin-top:auto;border-top:1px solid rgba(255,255,255,.12);padding:14px 8px 0;color:#b9c9c2;font-size:11px;line-height:1.55}.sidefoot strong{color:#eef5f1}
+.main{padding:28px 30px 42px;max-width:1500px;width:100%;min-width:0}.topbar{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:20px}.toptools{display:flex;gap:8px;align-items:center}
+h1{font-size:29px;letter-spacing:-.035em;margin:0 0 3px;line-height:1.15}h2{font-size:19px;letter-spacing:-.02em;margin:0}h3{margin:0;font-size:15px}.sub{color:var(--muted);font-size:13px;line-height:1.5}.eyebrow{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;color:var(--muted)}
+.grid{display:grid;gap:14px}.grid.cols4{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.cols3{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.cols2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);min-width:0}.card.compact{padding:14px}.card.flat{box-shadow:none}.card.hover{transition:.15s ease}.card.hover:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(48,45,37,.1)}
+.hero{position:relative;overflow:hidden;background:var(--panel);padding:22px 23px}.hero:after{content:"";position:absolute;width:180px;height:180px;border:34px solid rgba(23,60,49,.045);border-radius:50%;right:-60px;top:-75px}.heroline{display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;z-index:1}.hero h2{font-size:25px;margin-top:4px}.hero-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}.hero-meta span{font-size:12px;color:var(--muted);background:var(--panel2);border:1px solid #ebe5da;padding:5px 8px;border-radius:999px}
+.kpi{box-shadow:none;position:relative}.kpi:before{content:"";position:absolute;left:0;top:18px;bottom:18px;width:3px;border-radius:4px;background:var(--forest2)}.kpi .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.105em;font-weight:800}.kpi .value{font-size:27px;font-weight:800;letter-spacing:-.035em;margin-top:7px}.kpi .mini{font-size:11px;color:var(--muted);margin-top:4px}.kpi.warnk:before{background:var(--gold)}.kpi.accentk:before{background:var(--accent)}
+.section{margin-top:16px}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:11px}.sectiontitle{display:flex;gap:10px;align-items:center}.sectionicon{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:var(--panel2);border:1px solid var(--line)}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:9px 13px;border-radius:10px;font-weight:650;transition:.12s ease}.btn:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(30,35,31,.07)}.btn.primary{background:var(--forest);color:#fff;border-color:var(--forest)}.btn.accent{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.danger{background:#fff7f7;color:var(--bad);border-color:#eccccc}.btn.ghost{background:transparent}.btn.small{padding:7px 9px;font-size:12px}.btn.icon{display:inline-flex;gap:7px;align-items:center}.btn:disabled{cursor:not-allowed;opacity:.45;transform:none;box-shadow:none}.actions{display:flex;gap:8px;flex-wrap:wrap}.quickactions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.quickactions .btn{text-align:left;padding:11px 12px;background:var(--panel2)}
+.badge{display:inline-flex;align-items:center;padding:5px 8px;border-radius:999px;background:var(--soft);font-size:11px;font-weight:700}.badge.good{background:#e6f2eb;color:var(--good)}.badge.warn{background:#fff2dc;color:var(--warn)}.badge.bad{background:#f8e4e4;color:var(--bad)}.badge.dark{background:var(--forest);color:#fff}
+.list{display:grid;gap:4px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #eee8df}.row:last-child{border-bottom:0}.row strong{display:block}.muted{color:var(--muted)}.tiny{font-size:11px;color:var(--muted2)}
+.checkrow{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px}.checkrow:hover{background:var(--panel2)}.checkrow input{width:17px;height:17px;accent-color:var(--forest)}
+.tablewrap{overflow:auto;border-radius:12px}table{width:100%;border-collapse:collapse;font-size:13px;min-width:680px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #eee8df;vertical-align:middle}th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;background:#fbf8f2;position:sticky;top:0}tbody tr:hover{background:#fcfaf6}
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}input:hover,select:hover,textarea:hover{border-color:#cfc6b8}textarea{min-height:84px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:11px;font-weight:750;color:var(--muted);margin:0 0 5px}
+.modalback{position:fixed;inset:0;background:rgba(14,25,21,.56);display:none;align-items:center;justify-content:center;padding:18px;z-index:60;backdrop-filter:blur(3px)}.modalback.show{display:flex}.modal{background:var(--panel);width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:20px;border:1px solid var(--line);padding:21px;box-shadow:var(--shadow-lg)}
+.market{background:#14362c;color:#fff;min-height:calc(100vh - 82px);border-radius:20px;padding:18px;box-shadow:var(--shadow-lg)}.market .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid rgba(255,255,255,.11)}.market .toolbar h2{font-size:22px}.marketstats{display:flex;gap:8px;align-items:center}.marketstat{background:rgba(255,255,255,.08);padding:8px 11px;border-radius:10px;min-width:100px}.marketstat strong{font-size:17px}.marketstat small{display:block;color:#afc7bd;font-size:10px;text-transform:uppercase;letter-spacing:.06em;margin-top:2px}.categorybar{display:flex;gap:7px;overflow:auto;padding:2px 0 8px;scrollbar-width:none}.categorybar::-webkit-scrollbar{display:none}.categorybar button{white-space:nowrap;background:#234c3f;color:#fff;border:1px solid #3b6559;padding:8px 11px;border-radius:999px;font-weight:650}.categorybar button.active{background:#fff;color:#173d32;border-color:#fff}.productsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:7px}.producttile{background:#fff;color:#21332c;border:0;border-radius:14px;padding:14px;text-align:left;min-height:120px;position:relative;box-shadow:0 7px 18px rgba(0,0,0,.12)}.producttile:hover{transform:translateY(-1px)}.producttile .price{font-size:20px;font-weight:850;margin-top:12px}.producttile .stock{position:absolute;right:11px;top:11px;font-size:10px;background:#eef2ef;border-radius:999px;padding:4px 7px;color:#446057}.producttile .cartqty{position:absolute;right:10px;bottom:10px;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800}.salefooter{position:sticky;bottom:0;background:#0d281f;padding:12px 14px;margin:16px -18px -18px;border-radius:0 0 20px 20px;display:flex;gap:12px;align-items:center;justify-content:space-between;box-shadow:0 -8px 22px rgba(0,0,0,.15)}
+.progress{height:8px;background:#e9e1d5;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--forest2)}.bar{height:10px;background:#ebe4da;border-radius:999px;overflow:hidden}.bar span{display:block;height:100%;background:var(--accent)}
+.notice{padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff8ec}.notice.good{background:#edf7f1;border-color:#cce6d6}.notice strong{display:block;margin-bottom:2px}.mobilemenu{display:none}.hidden{display:none!important}.empty{padding:35px 24px;text-align:center;color:var(--muted)}.empty .emptyicon{font-size:30px;display:block;margin-bottom:7px}.statline{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #eee8df}.statline:last-child{border-bottom:0}
+.eventcard .eventdate{font-size:11px;color:var(--muted);margin:6px 0 14px}.eventcard h2{font-size:18px}.eventcard .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.metricmini{background:var(--panel2);border:1px solid #ebe5da;border-radius:10px;padding:9px}.metricmini span{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}.metricmini strong{display:block;margin-top:3px}
+.toast{position:fixed;right:22px;bottom:22px;z-index:90;background:#162f28;color:#fff;padding:11px 14px;border-radius:11px;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transform:translateY(8px);transition:.2s}.toast.show{opacity:1;transform:translateY(0)}
+.welcome{max-width:790px}.welcomehero{display:grid;grid-template-columns:1.4fr .8fr;gap:18px;background:var(--forest);color:#fff;border-radius:17px;padding:24px;overflow:hidden;position:relative}.welcomehero:after{content:"";position:absolute;width:210px;height:210px;border:44px solid rgba(255,255,255,.055);border-radius:50%;right:-70px;top:-90px}.welcomehero h2{font-size:29px;line-height:1.05;margin:5px 0 10px}.welcomehero p{color:#d4e2dc;line-height:1.55;margin:0}.welcomemark{align-self:center;justify-self:center;width:112px;height:112px;border-radius:26px;background:#fff;color:var(--forest);display:grid;place-items:center;font-size:45px;font-weight:900;box-shadow:0 20px 40px rgba(0,0,0,.18);z-index:1}.choicegrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.choice{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--panel);cursor:pointer}.choice:hover{border-color:#cbbfae;background:#fffcf7}.choice h3{font-size:16px;margin:7px 0 5px}.choice p{margin:0;color:var(--muted);line-height:1.45;font-size:12px}.choice .choiceico{font-size:22px}.tourstep{display:flex;gap:12px;padding:13px;border-radius:12px;background:var(--panel2);margin-top:9px}.tourstep .num{flex:0 0 27px;height:27px;border-radius:50%;display:grid;place-items:center;background:var(--forest);color:#fff;font-size:11px;font-weight:800}.tourstep strong{display:block;margin-bottom:2px}.tourstep p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.datacallout{display:flex;gap:12px;align-items:flex-start;background:#edf6f1;border:1px solid #cce3d7;border-radius:13px;padding:13px;margin-top:13px}.datacallout .lock{font-size:20px}
+.onboard-strip{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;border-radius:12px;background:#203f35;color:#fff;margin-bottom:15px}.onboard-strip .sub{color:#bfd0c8}.onboard-strip .actions{flex-wrap:nowrap}
+@media(max-width:1050px){.grid.cols4{grid-template-columns:repeat(2,minmax(0,1fr))}.quickactions{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{position:fixed;left:-274px;width:256px;z-index:50;transition:.18s;box-shadow:var(--shadow-lg)}.sidebar.open{left:0}.mobilemenu{display:inline-flex}.main{padding:18px}.grid.cols3{grid-template-columns:repeat(2,minmax(0,1fr))}.productsgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.topbar{position:sticky;top:0;z-index:15;background:rgba(243,239,231,.94);backdrop-filter:blur(8px);padding:10px 0 12px;margin-top:-10px}.market{min-height:calc(100vh - 100px)}}
+@media(max-width:680px){.main{padding:13px}.grid.cols4,.grid.cols3,.grid.cols2,.formgrid{grid-template-columns:1fr}.heroline{align-items:flex-start;flex-direction:column}.quickactions{grid-template-columns:1fr 1fr}.toptools .backuplabel{display:none}h1{font-size:24px}.card{padding:15px;border-radius:14px}.productsgrid{grid-template-columns:1fr 1fr;gap:8px}.producttile{min-height:105px;padding:12px}.producttile .price{font-size:18px}.market{padding:12px;border-radius:15px;margin:0 -1px}.market .toolbar{align-items:flex-start}.marketstats{flex-direction:column;align-items:stretch}.marketstat{min-width:85px;padding:6px 8px}.salefooter{margin:14px -12px -12px;border-radius:0 0 15px 15px}.salefooter .actions .btn{padding:9px}.welcomehero{grid-template-columns:1fr}.welcomemark{display:none}.choicegrid{grid-template-columns:1fr}.onboard-strip{align-items:flex-start;flex-direction:column}.onboard-strip .actions{width:100%}.onboard-strip .btn{flex:1}table{font-size:12px}.modal{padding:16px;border-radius:16px}.toast{left:14px;right:14px;bottom:14px;text-align:center}}
+@media(max-width:420px){.productsgrid{grid-template-columns:1fr}.quickactions{grid-template-columns:1fr}.topbar{gap:8px}.toptools{gap:5px}.btn{padding:9px 10px}}
+
+/* MarketMate v1.3 — design reference system */
+:root{
+  --bg:#f7f3ea;
+  --panel:#fffefa;
+  --panel2:#f4f0e7;
+  --ink:#111a16;
+  --muted:#59655e;
+  --muted2:#829087;
+  --line:#e8e1d6;
+  --forest:#083828;
+  --forest2:#0f503b;
+  --forest3:#467a68;
+  --mint:#95efbf;
+  --accent:#d3a14f;
+  --soft:#f1ede5;
+  --shadow:0 18px 42px rgba(40,39,32,.08);
+  --shadow-lg:0 28px 80px rgba(25,30,26,.18);
+  --radius:28px;
+  --radius-sm:14px;
+}
+body{background:var(--bg);font-size:15px}
+.app{grid-template-columns:310px minmax(0,1fr)}
+.sidebar{padding:34px 24px 24px;background:#073728}
+.brand{font-size:34px;line-height:1;letter-spacing:-.045em;margin:8px 12px 11px;color:#fff}
+.brand small{font-size:11px;letter-spacing:.12em;margin-top:17px;color:#78aa91;opacity:1}
+.shopname{
+  position:relative;margin:26px 0 34px;padding:15px 46px 15px 48px;
+  border:1px solid rgba(135,231,180,.16);border-radius:999px;
+  background:rgba(0,0,0,.10);font-size:16px;font-weight:750;color:#fff;
+}
+.shopname:before{content:"";position:absolute;left:24px;top:50%;transform:translateY(-50%);width:10px;height:10px;background:var(--mint);border-radius:50%}
+.shopname:after{content:"⌃\A⌄";white-space:pre;position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:12px;line-height:.65;color:#8db8a5}
+.nav{gap:8px}
+.nav button{
+  position:relative;color:#7da18f;padding:12px 18px;border-radius:13px;
+  font-size:16px;font-weight:700;letter-spacing:-.01em;
+}
+.nav button .ico{width:22px;font-size:19px;color:#7fa392;opacity:1}
+.nav button:hover{background:rgba(255,255,255,.035);color:#c5dacf}
+.nav button.active{background:transparent;color:#f7fff9;box-shadow:none}
+.nav button.active .ico{color:#a7f3c9}
+.nav button.active:after{
+  content:"";position:absolute;right:18px;top:50%;transform:translateY(-50%);
+  width:10px;height:10px;border-radius:50%;background:var(--mint)
+}
+.nav .sep{margin:12px 12px;background:rgba(255,255,255,.08)}
+.sidefoot{
+  border:1px solid rgba(139,235,185,.14);border-radius:22px;padding:18px 22px;
+  margin:22px 0 0;background:rgba(0,0,0,.12);font-size:13px;color:#76a58e;line-height:1.5
+}
+.sidefoot strong{display:block;color:#9df5c4;font-size:14px;letter-spacing:.09em;margin-bottom:5px}
+.main{padding:38px 48px 58px;max-width:1620px}
+.topbar{margin-bottom:24px}
+h1{font-size:32px}
+h2{font-size:23px;letter-spacing:-.035em}
+.card{
+  border:0;border-radius:28px;padding:28px 34px;
+  box-shadow:0 16px 38px rgba(55,50,39,.065);background:#fff
+}
+.card.hover:hover{transform:translateY(-2px);box-shadow:0 22px 45px rgba(55,50,39,.09)}
+.section{margin-top:20px}
+.sectionhead{margin-bottom:18px}
+.sectionicon{
+  width:42px;height:42px;border:0;border-radius:50%;background:#f1eee7;
+  font-size:22px;color:#0e241b;font-weight:800
+}
+.badge{background:#f1eee7;padding:6px 12px;font-size:11px;letter-spacing:.05em}
+.btn{border-color:#e4ddd1;border-radius:13px;padding:10px 15px;background:#fff}
+.btn.primary{background:var(--forest);border-color:var(--forest)}
+.hero{padding:28px 34px}
+.hero:after{display:none}
+.hero h2{font-size:28px}
+.hero-meta span{background:#f4f0e7;border:0}
+.kpi{padding:22px 24px;border-radius:22px;background:#fff}
+.kpi:before{display:none}
+.kpi .label{font-size:10px}
+.kpi .value{font-size:29px}
+.checkrow{padding:14px 4px;border-bottom:1px solid #eee8dd;border-radius:0}
+.checkrow:last-child{border-bottom:0}
+.checkrow:hover{background:transparent}
+.checkrow input{width:27px;height:27px;appearance:none;border:1.5px solid #cfc9bd;border-radius:10px;background:#fff;position:relative}
+.checkrow input:checked{background:var(--forest);border-color:var(--forest)}
+.checkrow input:checked:after{content:"✓";position:absolute;color:white;left:6px;top:1px;font-size:16px;font-weight:800}
+.quickactions{grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.quickactions .qa-card{
+  min-width:0;border:0;border-radius:23px;background:#f2efe7;padding:22px 24px;text-align:left;
+  min-height:184px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  color:#121b16;box-shadow:none
+}
+.quickactions .qa-card:hover{transform:translateY(-2px);box-shadow:0 12px 25px rgba(45,43,35,.07)}
+.qa-icon{
+  width:42px;height:42px;display:grid;place-items:center;border-radius:50%;
+  margin-bottom:22px;color:#071d15;font-size:24px;font-weight:900
+}
+.qa-card strong{font-size:17px;line-height:1.15;letter-spacing:-.02em}
+.qa-card .tiny{font-size:15px;line-height:1.35;margin-top:6px;color:#3f4943}
+.metricmini{
+  min-height:122px;border:0;border-radius:24px;padding:24px 22px;background:#f2efe7;
+  display:flex;flex-direction:column;justify-content:center
+}
+.metricmini span{font-size:10px;font-weight:800;color:#344039}
+.metricmini strong{font-size:22px;line-height:1.08;margin-top:10px;white-space:normal;overflow-wrap:anywhere}
+.dashboard-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:15px;
+  border-top:1px solid #ece6dc;margin-top:18px;padding-top:17px;color:#37423c
+}
+.dashboard-footer .linkbtn{
+  border:0;background:transparent;padding:0;color:#1d3128;font-weight:750;letter-spacing:.08em;font-size:12px
+}
+.health-status{font-size:12px;font-weight:800;color:#0f7f4c;letter-spacing:.04em;white-space:nowrap}
+.health-status:before{content:"";display:inline-block;width:8px;height:8px;background:#17894f;border-radius:50%;margin-right:7px}
+.stock-clear{text-align:center;padding:2px 22px 24px;color:#26362f;line-height:1.45;font-size:15px}
+.stock-clear strong{display:block;font-size:18px;margin-bottom:7px}
+.add-task{
+  border:0;background:transparent;color:#0d5f3f;font-weight:800;font-size:14px;padding:0
+}
+.tablewrap{border-radius:20px}
+.eventcard .metrics{gap:12px}
+.notice{border:0;border-radius:18px}
+.modal{border:0;border-radius:28px}
+.market{border-radius:28px}
+@media(max-width:1120px){.app{grid-template-columns:270px minmax(0,1fr)}.sidebar{padding-left:18px;padding-right:18px}.main{padding:30px}.quickactions{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:980px){.app{grid-template-columns:1fr}.sidebar{width:270px;left:-290px}.main{padding:20px}.card{padding:22px}.topbar{background:rgba(247,243,234,.95)}}
+@media(max-width:680px){.main{padding:13px}.card{padding:20px;border-radius:22px}.quickactions{grid-template-columns:1fr 1fr;gap:10px}.quickactions .qa-card{min-height:150px;padding:17px}.qa-icon{margin-bottom:16px}.metricmini{min-height:100px;padding:18px}.dashboard-footer{align-items:flex-start;flex-direction:column}.shopname{margin-bottom:25px}}
+@media(max-width:420px){.quickactions{grid-template-columns:1fr}.quickactions .qa-card{min-height:auto}}
+
+
+/* MarketMate v1.4.0 — laptop layout fixes */
+.sidebar{
+  height:100dvh;
+  min-height:100vh;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(149,239,191,.22) transparent;
+}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(149,239,191,.20);border-radius:999px}
+
+/* Let quick actions choose a sensible column count based on the card width,
+   rather than forcing four narrow tiles on laptop screens. */
+.quickactions{
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+}
+.quickactions .qa-card{
+  min-width:145px;
+}
+.qa-card strong{
+  white-space:normal;
+}
+
+/* Event cards should never split currency/short KPI values across lines. */
+.eventcard .metricmini strong{
+  white-space:nowrap;
+  overflow-wrap:normal;
+  word-break:normal;
+  font-size:20px;
+}
+.eventcard .metricmini{
+  min-width:0;
+}
+
+/* Use card width, not viewport assumptions, to avoid cramped event layouts. */
+#view > .grid.cols3{
+  grid-template-columns:repeat(auto-fit,minmax(315px,1fr));
+}
+
+/* Laptop middle state: give dense dashboard areas more breathing room. */
+@media (max-width:1450px){
+  .app{grid-template-columns:270px minmax(0,1fr)}
+  .main{padding:30px 32px 48px}
+  .grid.cols2{gap:16px}
+  .card{padding:24px 26px}
+  .quickactions{grid-template-columns:repeat(2,minmax(145px,1fr))}
+  .quickactions .qa-card{min-height:160px}
+  .metricmini{padding:20px}
+}
+@media (max-width:1220px){
+  .app{grid-template-columns:250px minmax(0,1fr)}
+  .main{padding:26px 24px 42px}
+  #view > .grid.cols3{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:980px){
+  #view > .grid.cols3{grid-template-columns:1fr}
+}
+
+
+/* MarketMate v1.4.0 — shop selector alignment fix */
+.shopname{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-height:54px;
+  width:100%;
+  margin:26px 0 34px;
+  padding:10px 18px;
+  border:1px solid rgba(135,231,180,.18);
+  border-radius:999px;
+  background:rgba(0,0,0,.10);
+  color:#fff;
+  overflow:visible;
+  white-space:normal;
+  text-overflow:clip;
+  line-height:1.2;
+}
+.shopname:before,
+.shopname:after{content:none!important}
+.shopdot{
+  flex:0 0 11px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--mint);
+}
+.shoplabel{
+  flex:1 1 auto;
+  min-width:0;
+  color:#fff;
+  font-size:15px;
+  line-height:1.2;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.shopchev{
+  flex:0 0 auto;
+  color:#8db8a5;
+  font-size:11px;
+  line-height:.72;
+  text-align:center;
+  transform:translateY(-1px);
+}
+@media(max-width:1120px){
+  .shopname{padding:10px 14px;gap:11px}
+  .shoplabel{font-size:14px}
+}
+
+
+/* Hosted demo sandbox */
+.demo-ribbon{position:fixed;top:0;left:0;right:0;height:44px;z-index:2000;background:#092f25;color:#fff;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 16px;font-size:12px;box-shadow:0 2px 12px rgba(0,0,0,.16)}
+.demo-ribbon strong{letter-spacing:.08em}.demo-ribbon span{color:#d5e5dc}.demo-ribbon .demo-actions{display:flex;gap:7px;margin-left:8px}.demo-ribbon button,.demo-ribbon a{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:6px 10px;font-weight:750;text-decoration:none;cursor:pointer;font:inherit}.demo-ribbon a{background:#95efbf;color:#092f25;border-color:#95efbf}.app{padding-top:44px}.sidebar{top:44px!important;height:calc(100dvh - 44px)!important;min-height:calc(100vh - 44px)!important}.demo-chip{display:inline-flex;align-items:center;gap:6px;background:#e7f6ed;color:#1c6047;border:1px solid #cce9d8;padding:7px 10px;border-radius:999px;font-size:11px;font-weight:800}.demo-lock{opacity:.7}.demo-disabled{opacity:.58}.demo-cta-card{background:var(--forest);color:white}.demo-cta-card .muted,.demo-cta-card .sub{color:#c9d9d2}.demo-cta-card .btn{background:#95efbf;color:#092f25;border-color:#95efbf}
+@media(max-width:720px){.demo-ribbon{height:auto;min-height:52px;flex-wrap:wrap;justify-content:flex-start;padding:7px 10px}.demo-ribbon>span{display:none}.app{padding-top:58px}.sidebar{top:58px!important;height:calc(100dvh - 58px)!important;min-height:calc(100vh - 58px)!important}.demo-ribbon .demo-actions{margin-left:auto}}
+
+</style>
+</head>
+<body>
+<div class="demo-ribbon" role="status">
+  <strong>MARKETMATE DEMO</strong><span>Sample data • disposable sandbox • exports disabled</span>
+  <div class="demo-actions"><button onclick="resetDemo()">Reset demo</button><a href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get full version</a></div>
+</div>
+
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">MarketMate<small>CRAFT FAIR COMMAND CENTRE</small></div>
+  <div class="shopname"><span class="shopdot" aria-hidden="true"></span><span class="shoplabel" id="sideShop">Your market business</span><span class="shopchev" aria-hidden="true">⌃<br>⌄</span></div>
+  <div class="nav" id="nav"></div>
+  <div class="sidefoot"><strong>◉ Sandboxed demo</strong>Sample data lives only in this browser session.<br><span style="display:block;margin-top:8px">MarketMate <span id="sideVersion">Demo</span></span></div>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <div><button class="btn mobilemenu" onclick="toggleMenu()">☰</button><span id="pageTitleWrap"></span></div>
+    <div class="toptools"><span class="demo-chip">● DEMO MODE</span><button class="btn small icon" onclick="showQuickStart()">? <span class="backuplabel">Quick Start</span></button><button class="btn small primary icon" onclick="resetDemo()">↻ <span class="backuplabel">Reset Demo</span></button></div>
+  </div>
+  <div id="view"></div>
+</main>
+</div>
+
+<div class="modalback" id="modalBack"><div class="modal" id="modal"></div></div>
+<input id="restoreInput" type="file" accept=".json,application/json" class="hidden">
+<input id="productImportInput" type="file" accept=".csv,text/csv" class="hidden">
+<div class="toast" id="toast"></div>
+
+<script>
+const VERSION="1.4.0-demo", KEY="marketmate_demo_sandbox_v1", DEMO_MODE=true, DEMO_PRODUCT_LIMIT=8, DEMO_EVENT_LIMIT=5;
+const $=s=>document.querySelector(s);
+const money=n=>new Intl.NumberFormat(state.settings.locale||'en-AU',{style:'currency',currency:state.settings.currency||'AUD',maximumFractionDigits:0}).format(Number(n||0));
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const escapeHtml=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function demoData(){
+ const products=[
+  {id:"p1",name:"Botanical Earrings",sku:"EAR-BOT",category:"Jewellery",price:38,material:5,labor:6,packaging:1.5,other:0,stock:14,threshold:5,active:true},
+  {id:"p2",name:"Vanilla Soy Candle",sku:"CAN-VAN",category:"Candles",price:28,material:8,labor:4,packaging:2,other:0,stock:12,threshold:6,active:true},
+  {id:"p3",name:"Sandalwood Candle",sku:"CAN-SAN",category:"Candles",price:32,material:9,labor:4,packaging:2,other:0,stock:8,threshold:5,active:true},
+  {id:"p4",name:"Mini Art Print",sku:"PR-MINI",category:"Prints",price:18,material:3,labor:2,packaging:1,other:0,stock:26,threshold:10,active:true},
+  {id:"p5",name:"Greeting Card Set",sku:"CARD-SET",category:"Paper",price:16,material:4,labor:2,packaging:1,other:0,stock:20,threshold:8,active:true},
+  {id:"p6",name:"Ceramic Trinket Dish",sku:"CER-DISH",category:"Ceramics",price:34,material:7,labor:8,packaging:2,other:1,stock:6,threshold:4,active:true}
+ ];
+ const events=[
+  {id:"e1",name:"Newtown Makers Market",venue:"Newtown Community Hall",location:"Newtown NSW",date:"2026-08-22",start:"09:00",end:"16:00",status:"Completed",stall:140,travel:35,parking:20,staff:0,misc:15,target:2500,feePaid:true,attend:"Yes",notes:"Strong jewellery and candle sales."},
+  {id:"e2",name:"Inner West Handmade",venue:"Marrickville Pavilion",location:"Marrickville NSW",date:"2026-09-05",start:"10:00",end:"16:00",status:"Completed",stall:120,travel:25,parking:15,staff:0,misc:20,target:2200,feePaid:true,attend:"Maybe",notes:"Prints slower than expected."},
+  {id:"e3",name:"Sydney Makers Market",venue:"Carriageworks",location:"Eveleigh NSW",date:"2026-10-12",start:"09:00",end:"17:00",status:"Confirmed",stall:180,travel:30,parking:25,staff:0,misc:20,target:3000,feePaid:true,attend:"",notes:""}
+ ];
+ const allocations=[
+  {eventId:"e1",productId:"p1",planned:12,packed:12},{eventId:"e1",productId:"p2",planned:20,packed:20},{eventId:"e1",productId:"p3",planned:16,packed:16},{eventId:"e1",productId:"p4",planned:30,packed:30},{eventId:"e1",productId:"p5",planned:22,packed:22},{eventId:"e1",productId:"p6",planned:10,packed:10},
+  {eventId:"e2",productId:"p1",planned:10,packed:10},{eventId:"e2",productId:"p2",planned:18,packed:18},{eventId:"e2",productId:"p3",planned:14,packed:14},{eventId:"e2",productId:"p4",planned:28,packed:28},{eventId:"e2",productId:"p5",planned:18,packed:18},{eventId:"e2",productId:"p6",planned:8,packed:8},
+  {eventId:"e3",productId:"p1",planned:14,packed:10},{eventId:"e3",productId:"p2",planned:24,packed:18},{eventId:"e3",productId:"p3",planned:18,packed:12},{eventId:"e3",productId:"p4",planned:30,packed:24},{eventId:"e3",productId:"p5",planned:24,packed:20},{eventId:"e3",productId:"p6",planned:10,packed:6},
+ ];
+ const sales=[];
+ function add(eventId,productId,qty,price,payment,day){
+   sales.push({id:uid(),eventId,productId,qty,price,discount:0,payment,date:day});
+ }
+ add("e1","p1",10,38,"Card","2026-08-22T10:15"); add("e1","p2",18,28,"Card","2026-08-22T11:05");
+ add("e1","p3",12,32,"Cash","2026-08-22T12:10"); add("e1","p4",8,18,"Card","2026-08-22T13:20");
+ add("e1","p5",11,16,"Cash","2026-08-22T14:10"); add("e1","p6",7,34,"Card","2026-08-22T15:05");
+ add("e2","p1",7,38,"Card","2026-09-05T10:45"); add("e2","p2",13,28,"Card","2026-09-05T11:40");
+ add("e2","p3",9,32,"Cash","2026-09-05T12:15"); add("e2","p4",5,18,"Card","2026-09-05T13:00");
+ add("e2","p5",9,16,"Card","2026-09-05T14:20"); add("e2","p6",4,34,"Cash","2026-09-05T15:10");
+ return {
+  schema:1,version:VERSION,lastBackup:null,
+  settings:{business:"Willow & Field Studio",currency:"AUD",locale:"en-AU",lowStock:5},
+  products,events,allocations,sales,
+  expenses:[
+    {id:"x1",eventId:"e1",type:"Extra supplies",amount:45,date:"2026-08-22"},
+    {id:"x2",eventId:"e2",type:"Lunch/incidentals",amount:28,date:"2026-09-05"}
+  ],
+  tasks:[
+    {id:"t1",eventId:"e3",text:"Make 12 botanical earrings",done:false},
+    {id:"t2",eventId:"e3",text:"Print price labels",done:true},
+    {id:"t3",eventId:"e3",text:"Pack EFTPOS charger",done:false},
+    {id:"t4",eventId:"e3",text:"Prepare display signage",done:false}
+  ]
+ };
+}
+function blankData(){return {schema:1,version:VERSION,lastBackup:null,settings:{business:"",currency:"AUD",locale:"en-AU",lowStock:5,onboardingComplete:true},products:[],events:[],allocations:[],sales:[],expenses:[],tasks:[]}}
+let state=load();
+function load(){try{return JSON.parse(sessionStorage.getItem(KEY))||demoData()}catch(e){return demoData()}}
+function save(){sessionStorage.setItem(KEY,JSON.stringify(state))}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove("show"),2200)}
+function toggleMenu(){$("#sidebar").classList.toggle("open")}
+function navTo(page){location.hash=page; render(); $("#sidebar").classList.remove("open")}
+const navItems=[["dashboard","⌂","Dashboard"],["events","◫","Events"],["products","◇","Products"],["inventory","▦","Inventory"],["market","●","Market Mode"],["sales","↗","Sales"],["insights","⌁","Insights"],["sep","",""] ,["backup","↧","Demo & Full Version"],["settings","⚙","Settings"],["help","?","Help"]];
+function renderNav(){
+ $("#nav").innerHTML=navItems.map(([id,ico,label])=>id==="sep"?'<div class="sep"></div>':`<button class="${current()===id?'active':''}" onclick="navTo('${id}')"><span class="ico">${ico}</span><span>${label}</span></button>`).join("");
+ $("#sideShop").textContent=state.settings?.business||"Willow & Field Studio"; $("#sideVersion").textContent="Demo";
+}
+function current(){return (location.hash||"#dashboard").slice(1)}
+function pageTitle(title,sub=""){ $("#pageTitleWrap").innerHTML=`<h1>${title}</h1><div class="sub">${sub}</div>` }
+
+function totalCost(p){return Number(p.material||0)+Number(p.labor||0)+Number(p.packaging||0)+Number(p.other||0)}
+function productBy(id){return state.products.find(p=>p.id===id)}
+function eventBy(id){return state.events.find(e=>e.id===id)}
+function salesForEvent(id){return state.sales.filter(s=>s.eventId===id)}
+function unitsSold(eventId,productId){return state.sales.filter(s=>s.eventId===eventId&&(!productId||s.productId===productId)).reduce((a,s)=>a+Number(s.qty),0)}
+function revenueEvent(id){return salesForEvent(id).reduce((a,s)=>a+(s.qty*s.price-s.discount),0)}
+function cogsEvent(id){return salesForEvent(id).reduce((a,s)=>a+s.qty*totalCost(productBy(s.productId)||{}),0)}
+function eventExpenses(id){
+ const e=eventBy(id)||{}; return Number(e.stall||0)+Number(e.travel||0)+Number(e.parking||0)+Number(e.staff||0)+Number(e.misc||0)+state.expenses.filter(x=>x.eventId===id).reduce((a,x)=>a+Number(x.amount||0),0)
+}
+function profitEvent(id){return revenueEvent(id)-cogsEvent(id)-eventExpenses(id)}
+function sellThrough(eventId){
+ const packed=state.allocations.filter(a=>a.eventId===eventId).reduce((a,x)=>a+Number(x.packed||0),0), sold=unitsSold(eventId);
+ return packed?Math.round(sold/packed*100):0
+}
+function eventAvailable(eventId,productId){
+ const p=productBy(productId); if(!p)return 0;
+ const a=state.allocations.find(x=>x.eventId===eventId&&x.productId===productId);
+ if(!a || Number(a.packed||0)<=0) return Number(p.stock||0);
+ return Math.max(0,Math.min(Number(p.stock||0),Number(a.packed||0)-unitsSold(eventId,productId)));
+}
+function nextEvent(){return state.events.filter(e=>e.status!=="Completed").sort((a,b)=>a.date.localeCompare(b.date))[0]}
+function lastEvent(){return state.events.filter(e=>e.status==="Completed").sort((a,b)=>b.date.localeCompare(a.date))[0]}
+function prepPct(eventId){let t=state.tasks.filter(x=>x.eventId===eventId);return t.length?Math.round(t.filter(x=>x.done).length/t.length*100):0}
+function stockReady(eventId){let a=state.allocations.filter(x=>x.eventId===eventId);let p=a.reduce((s,x)=>s+Number(x.planned||0),0),k=a.reduce((s,x)=>s+Number(x.packed||0),0);return {packed:k,planned:p,pct:p?Math.round(k/p*100):0}}
+function bestProduct(eventId){
+ const map={}; salesForEvent(eventId).forEach(s=>map[s.productId]=(map[s.productId]||0)+s.qty*s.price);
+ const id=Object.entries(map).sort((a,b)=>b[1]-a[1])[0]?.[0]; return productBy(id)?.name||"—";
+}
+function dateText(d){return new Date(d+"T00:00:00").toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"})}
+function daysTo(d){return Math.ceil((new Date(d+"T00:00:00")-new Date())/86400000)}
+
+function renderDashboard(){
+ const n=nextEvent(), l=lastEvent(), sr=n?stockReady(n.id):{packed:0,planned:0,pct:0};
+ pageTitle("Dashboard","What needs your attention?");
+ const tasks=n?state.tasks.filter(t=>t.eventId===n.id):[];
+ const low=state.products.filter(p=>p.stock<=p.threshold);
+ const days=n?Math.max(0,daysTo(n.date)):0;
+ const totalProducts=state.products.length;
+ const healthy=totalProducts-low.length;
+ const healthPct=totalProducts?Math.round(healthy/totalProducts*100):100;
+ $("#view").innerHTML=`
+ ${state.products.length===0?`<div class="onboard-strip"><div><strong>Your workspace is ready.</strong><div class="sub">Add a product and an event to start getting useful numbers.</div></div><div class="actions"><button class="btn small" onclick="openProduct()">Add product</button><button class="btn small" onclick="openEvent()">Add event</button></div></div>`:""}
+ <div class="card hero">
+  <div class="heroline"><div><div class="eyebrow">Next market</div><h2>${n?.name||"Nothing booked yet"}</h2><div class="hero-meta">${n?`<span>${dateText(n.date)}</span><span>${n.location||"Location not set"}</span><span>${days} day${days===1?'':'s'} away</span>`:`<span>Create an event to start planning</span>`}</div></div>${n?`<span class="badge good">${n.status}</span>`:`<button class="btn primary" onclick="openEvent()">+ Add event</button>`}</div>
+ </div>
+
+ <div class="grid cols4 section">
+  ${kpi("Revenue target",n?money(n.target):"—","Upcoming event")}
+  ${kpi("Stock ready",n?`${sr.packed} / ${sr.planned}`:"—",n?`${sr.pct}% packed`:"No stock plan","accentk")}
+  ${kpi("Break-even",n?money(Math.round(eventExpenses(n.id)/0.62)):"—","Planning estimate","warnk")}
+  ${kpi("Prep complete",n?`${prepPct(n.id)}%`:"—","Checklist completion")}
+ </div>
+
+ <div class="grid cols2 section">
+  <div class="card">
+    <div class="sectionhead"><div class="sectiontitle"><div class="sectionicon">✓</div><h2>Still to do</h2></div></div>
+    ${tasks.length?tasks.map(t=>`<label class="checkrow"><input type="checkbox" ${t.done?'checked':''} onchange="toggleTask('${t.id}',this.checked)"><span style="${t.done?'text-decoration:line-through;color:var(--muted2)':''}">${t.text}</span></label>`).join(""):'<div class="empty">No preparation tasks yet.</div>'}
+    <div class="dashboard-footer">
+      <button class="add-task" ${!n?'disabled':''} onclick="addDashboardTask('${n?.id||""}')">＋ Add task</button>
+      <span>${tasks.filter(t=>t.done).length} of ${tasks.length} completed</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionhead"><div class="sectiontitle"><div class="sectionicon">◇</div><h2>Stock to watch</h2></div></div>
+    ${low.length
+      ? low.map(p=>`<div class="row"><div><strong>${p.name}</strong><span class="sub">${p.sku||p.category||"Product"}</span></div><span class="badge ${p.stock<=2?'bad':'warn'}">${p.stock} left</span></div>`).join("")
+      : `<div class="stock-clear"><strong>Everything looks well stocked.</strong>All ${totalProducts} product line${totalProducts===1?' is':'s are'} above alert thresholds for the upcoming market.</div>`}
+    <div class="dashboard-footer">
+      <span>Inventory health: ${low.length?"Needs attention":"Optimal"}</span>
+      <span class="health-status">${healthPct}% IN STOCK</span>
+    </div>
+  </div>
+ </div>
+
+ <div class="grid cols2 section">
+  <div class="card">
+    <div class="sectionhead"><div class="sectiontitle"><div class="sectionicon">ϟ</div><h2>Quick actions</h2></div></div>
+    <div class="quickactions">
+      <button class="qa-card" onclick="navTo('market')"><span class="qa-icon">▤</span><strong>Record sale</strong><span class="tiny">Open<br>Market Mode</span></button>
+      <button class="qa-card" onclick="openProduct()"><span class="qa-icon">⊕</span><strong>Add product</strong><span class="tiny">Grow your<br>catalogue</span></button>
+      <button class="qa-card" onclick="openEvent()"><span class="qa-icon">▣</span><strong>Add event</strong><span class="tiny">Plan another<br>market</span></button>
+      <button class="qa-card" onclick="quickBackup()"><span class="qa-icon">☁</span><strong>Back up</strong><span class="tiny">Protect<br>your data</span></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionhead"><div class="sectiontitle"><div class="sectionicon">◷</div><h2>Last event</h2></div>${l?`<span class="badge">${dateText(l.date)}</span>`:""}</div>
+    ${l?`<div class="grid cols2">
+      <div class="metricmini"><span>Revenue</span><strong>${money(revenueEvent(l.id))}</strong></div>
+      <div class="metricmini"><span>Profit</span><strong style="color:var(--good)">${money(profitEvent(l.id))}</strong></div>
+      <div class="metricmini"><span>Best seller</span><strong>${bestProduct(l.id)}</strong></div>
+      <div class="metricmini"><span>Sell-through</span><strong>${sellThrough(l.id)}%</strong></div>
+    </div>
+    <div class="dashboard-footer" style="justify-content:flex-end"><button class="linkbtn" onclick="navTo('events')">View full event breakdown →</button></div>`
+    :'<div class="empty">Complete your first market to see performance here.</div>'}
+  </div>
+ </div>`;
+}
+
+function addDashboardTask(eventId){
+ if(!eventId){alert("Add an upcoming event first.");return}
+ const textValue=prompt("Add a preparation task:");
+ if(!textValue || !textValue.trim())return;
+ state.tasks.push({id:uid(),eventId,text:textValue.trim(),done:false});
+ save();toast("Task added");renderDashboard();
+}
+
+function kpi(label,value,mini,kind=""){return `<div class="card kpi ${kind}"><div class="label">${label}</div><div class="value">${value}</div><div class="mini">${mini}</div></div>`}
+function toggleTask(id,v){state.tasks.find(t=>t.id===id).done=v;save();renderDashboard()}
+
+function renderEvents(){
+ pageTitle("Events","What's coming up?");
+ const sorted=state.events.slice().sort((a,b)=>a.date.localeCompare(b.date));
+ $("#view").innerHTML=`<div class="sectionhead"><div><span class="badge">${sorted.length} event${sorted.length===1?'':'s'}</span></div><button class="btn primary" onclick="openEvent()">+ Add event</button></div>
+ ${sorted.length?`<div class="grid cols3">${sorted.map(e=>`
+ <div class="card hover eventcard">
+  <div class="sectionhead"><span class="badge ${e.status==='Completed'?'':e.status==='Fee Due'?'warn':'good'}">${e.status}</span><button class="btn small" onclick="openEvent('${e.id}')">Edit</button></div>
+  <h2>${e.name}</h2><div class="eventdate">${dateText(e.date)} · ${e.location||"Location not set"}</div>
+  <div class="metrics">
+   <div class="metricmini"><span>${e.status==='Completed'?'Revenue':'Target'}</span><strong>${money(e.status==='Completed'?revenueEvent(e.id):e.target)}</strong></div>
+   <div class="metricmini"><span>${e.status==='Completed'?'Profit':'Stall fee'}</span><strong>${money(e.status==='Completed'?profitEvent(e.id):e.stall)}</strong></div>
+   ${e.status==='Completed'?`<div class="metricmini"><span>Sell-through</span><strong>${sellThrough(e.id)}%</strong></div><div class="metricmini"><span>Attend again</span><strong>${e.attend||"Not rated"}</strong></div>`:`<div class="metricmini"><span>Days away</span><strong>${Math.max(0,daysTo(e.date))}</strong></div><div class="metricmini"><span>Fee status</span><strong>${e.feePaid?'Paid':'Check'}</strong></div>`}
+  </div>
+  <div class="actions section"><button class="btn small" onclick="duplicateEvent('${e.id}')">Duplicate</button>${e.status!=='Completed'?`<button class="btn small" onclick="navTo('inventory')">Plan stock</button>`:""}</div>
+ </div>`).join("")}</div>`:`<div class="card empty"><span class="emptyicon">◫</span><h2>No events yet</h2><p>Add your first market, fair or pop-up to start planning.</p><button class="btn primary" onclick="openEvent()">Add your first event</button></div>`}`;
+}
+function openEvent(id){
+ const e=id?structuredClone(eventBy(id)):{id:"",name:"",venue:"",location:"",date:"",start:"09:00",end:"16:00",status:"Considering",stall:0,travel:0,parking:0,staff:0,misc:0,target:2000,feePaid:false,attend:"",notes:""};
+ openModal(`<div class="sectionhead"><h2>${id?"Edit":"Add"} event</h2><button class="btn small" onclick="closeModal()">✕</button></div>
+ <div class="formgrid">
+ ${field("Name","ev_name",e.name)}${field("Venue","ev_venue",e.venue)}${field("Location","ev_location",e.location)}${field("Date","ev_date",e.date,"date")}
+ ${field("Start","ev_start",e.start,"time")}${field("End","ev_end",e.end,"time")}
+ <div class="field"><label>Status</label><select id="ev_status">${["Considering","Applied","Accepted","Fee Due","Confirmed","Completed"].map(x=>`<option ${x===e.status?'selected':''}>${x}</option>`)}</select></div>
+ ${field("Revenue target","ev_target",e.target,"number")}${field("Stall fee","ev_stall",e.stall,"number")}${field("Travel","ev_travel",e.travel,"number")}
+ ${field("Parking","ev_parking",e.parking,"number")}${field("Staff","ev_staff",e.staff,"number")}${field("Misc","ev_misc",e.misc,"number")}
+ <div class="field"><label>Attend again?</label><select id="ev_attend"><option></option>${["Yes","Maybe","No"].map(x=>`<option ${x===e.attend?'selected':''}>${x}</option>`)}</select></div>
+ </div><div class="field section"><label>Notes</label><textarea id="ev_notes">${e.notes||""}</textarea></div>
+ <div class="actions section"><button class="btn primary" onclick="saveEvent('${id||""}')">Save</button>${id?`<button class="btn danger" onclick="deleteEvent('${id}')">Delete</button>`:""}</div>`);
+}
+function saveEvent(id){
+ const e={id:id||uid(),name:val("ev_name"),venue:val("ev_venue"),location:val("ev_location"),date:val("ev_date"),start:val("ev_start"),end:val("ev_end"),status:val("ev_status"),target:num("ev_target"),stall:num("ev_stall"),travel:num("ev_travel"),parking:num("ev_parking"),staff:num("ev_staff"),misc:num("ev_misc"),feePaid:false,attend:val("ev_attend"),notes:val("ev_notes")};
+ if(!e.name||!e.date)return alert("Please enter an event name and date.");
+ if(id) Object.assign(eventBy(id),e); else state.events.push(e);
+ save();closeModal();toast("Event saved");render();
+}
+function deleteEvent(id){
+ const linked=state.sales.filter(s=>s.eventId===id).length;
+ if(linked){alert(`This event has ${linked} sales record(s). Delete or reassign those sales first so historical reporting is not broken.`);return}
+ if(confirm("Delete this event?")){state.events=state.events.filter(e=>e.id!==id);state.allocations=state.allocations.filter(a=>a.eventId!==id);state.tasks=state.tasks.filter(t=>t.eventId!==id);state.expenses=state.expenses.filter(x=>x.eventId!==id);save();closeModal();render()}
+}
+function duplicateEvent(id){const o=eventBy(id),n={...structuredClone(o),id:uid(),name:o.name+" (Copy)",status:"Considering",attend:""};state.events.push(n);state.allocations.filter(a=>a.eventId===id).forEach(a=>state.allocations.push({...a,eventId:n.id}));save();render()}
+
+function renderProducts(){
+ pageTitle("Products","What are you selling?");
+ $("#view").innerHTML=`<div class="sectionhead"><div><span class="badge">${state.products.length} product${state.products.length===1?'':'s'}</span></div><div class="actions"><span class="demo-chip">Demo limit: ${DEMO_PRODUCT_LIMIT} products</span><button class="btn primary" onclick="openProduct()">+ Add product</button></div></div>
+ <div class="notice"><strong>CSV import is included in the full version.</strong><div class="sub">The purchased app includes template download, field mapping, validation preview, duplicate handling and a safety backup before import.</div></div>
+ ${state.products.length?`<div class="card section"><div class="tablewrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Price</th><th>Unit cost</th><th>Margin</th><th></th></tr></thead><tbody>
+ ${state.products.map(p=>`<tr><td><strong>${p.name}</strong><div class="sub">${p.category||"Uncategorised"}</div></td><td>${p.sku||"—"}</td><td><strong>${p.stock}</strong> ${p.stock<=p.threshold?'<span class="badge warn">Low</span>':''}</td><td>${money(p.price)}</td><td>${money(totalCost(p))}</td><td><span class="badge ${p.price&&((p.price-totalCost(p))/p.price*100)<40?'warn':'good'}">${p.price?Math.round((p.price-totalCost(p))/p.price*100):0}%</span></td><td><button class="btn small" onclick="openProduct('${p.id}')">Edit</button></td></tr>`).join("")}
+ </tbody></table></div></div>`:`<div class="card empty section"><span class="emptyicon">◇</span><h2>Add or import your products</h2><p>Enter products one at a time, or use the CSV importer if you already keep them in a spreadsheet.</p><div class="actions" style="justify-content:center"><button class="btn primary" onclick="openProduct()">Add product</button></div></div>`}`;
+}
+function openProduct(id){
+ const p=id?structuredClone(productBy(id)):{id:"",name:"",sku:"",category:"",price:0,material:0,labor:0,packaging:0,other:0,stock:0,threshold:5,active:true,notes:""};
+ openModal(`<div class="sectionhead"><h2>${id?"Edit":"Add"} product</h2><button class="btn small" onclick="closeModal()">✕</button></div><div class="formgrid">
+ ${field("Product name","pr_name",p.name)}${field("SKU","pr_sku",p.sku)}${field("Category","pr_cat",p.category)}
+ ${field("Selling price","pr_price",p.price,"number")}${field("Material cost","pr_material",p.material,"number")}${field("Labour cost","pr_labor",p.labor,"number")}
+ ${field("Packaging cost","pr_pack",p.packaging,"number")}${field("Other unit cost","pr_other",p.other,"number")}${field("Current stock","pr_stock",p.stock,"number")}${field("Low-stock threshold","pr_threshold",p.threshold,"number")}
+ </div><div class="field section"><label>Notes</label><textarea id="pr_notes">${p.notes||""}</textarea></div>
+ <div class="actions section"><button class="btn primary" onclick="saveProduct('${id||""}')">Save</button>${id?`<button class="btn danger" onclick="deleteProduct('${id}')">Delete</button>`:""}</div>`);
+}
+function saveProduct(id){
+ const p={id:id||uid(),name:val("pr_name"),sku:val("pr_sku"),category:val("pr_cat"),price:num("pr_price"),material:num("pr_material"),labor:num("pr_labor"),packaging:num("pr_pack"),other:num("pr_other"),stock:num("pr_stock"),threshold:num("pr_threshold"),active:true,notes:val("pr_notes")};
+ if(!p.name)return alert("Please enter a product name.");
+ if(id)Object.assign(productBy(id),p);else state.products.push(p);save();closeModal();toast("Product saved");render()
+}
+function deleteProduct(id){
+ const linked=state.sales.filter(s=>s.productId===id).length;
+ if(linked){alert(`This product has ${linked} sales record(s). Keep it for historical reporting or remove those sales first.`);return}
+ if(confirm("Delete this product?")){state.products=state.products.filter(p=>p.id!==id);state.allocations=state.allocations.filter(a=>a.productId!==id);save();closeModal();render()}
+}
+
+
+const PRODUCT_IMPORT_FIELDS=[
+ {key:"name",label:"Product Name",required:true,aliases:["product name","product","item name","item","name"]},
+ {key:"sku",label:"SKU",aliases:["sku","product code","code","item code"]},
+ {key:"category",label:"Category",aliases:["category","type","product category"]},
+ {key:"price",label:"Selling Price",numeric:true,aliases:["selling price","price","retail price","retail","sale price","unit price"]},
+ {key:"material",label:"Material Cost",numeric:true,aliases:["material cost","materials","materials cost"]},
+ {key:"labor",label:"Labour Cost",numeric:true,aliases:["labour cost","labor cost","labour","labor"]},
+ {key:"packaging",label:"Packaging Cost",numeric:true,aliases:["packaging cost","packaging"]},
+ {key:"other",label:"Other Cost",numeric:true,aliases:["other cost","other unit cost","other"]},
+ {key:"stock",label:"Opening Stock",numeric:true,aliases:["opening stock","stock","quantity","qty","on hand","stock on hand","stock qty","stock quantity"]},
+ {key:"threshold",label:"Low Stock Threshold",numeric:true,aliases:["low stock threshold","threshold","reorder level","restock threshold"]}
+];
+let productImportSession=null;
+function normaliseHeader(v){return String(v||"").trim().toLowerCase().replace(/[_-]+/g," ").replace(/\s+/g," ")}
+function csvEscape(v){return `"${String(v??"").replaceAll('"','""')}"`}
+function downloadProductTemplate(){
+ const header=PRODUCT_IMPORT_FIELDS.map(f=>f.label).join(",")+"\n";
+ download("marketmate-product-import-template.csv",header,"text/csv");toast("CSV template downloaded")
+}
+function beginProductImport(){ $("#productImportInput").click() }
+function parseCSV(text){
+ text=String(text||"").replace(/^\uFEFF/,"");
+ const rows=[];let row=[],field="",quoted=false;
+ for(let i=0;i<text.length;i++){
+  const c=text[i];
+  if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++}else if(c==='"'){quoted=false}else field+=c}
+  else if(c==='"'){quoted=true}
+  else if(c===','){row.push(field);field=""}
+  else if(c==='\n'){row.push(field);rows.push(row);row=[];field=""}
+  else if(c!=='\r'){field+=c}
+ }
+ row.push(field); if(row.some(x=>String(x).trim()!==""))rows.push(row);
+ return rows;
+}
+function autoMapHeaders(headers){
+ const norm=headers.map(normaliseHeader), map={};
+ PRODUCT_IMPORT_FIELDS.forEach(f=>{const idx=norm.findIndex(h=>f.aliases.includes(h));map[f.key]=idx>=0?idx:""});
+ return map;
+}
+function importMapSelect(field,headers,mapping){
+ return `<div class="field"><label>${field.label}${field.required?' *':''}</label><select id="map_${field.key}"><option value="">Not mapped</option>${headers.map((h,i)=>`<option value="${i}" ${String(mapping[field.key])===String(i)?'selected':''}>${escapeHtml(h||`Column ${i+1}`)}</option>`).join("")}</select></div>`
+}
+function showProductImportMapping(){
+ const x=productImportSession;if(!x)return;
+ openModal(`<div class="sectionhead"><div><div class="eyebrow">CSV import · Step 1 of 2</div><h2>Match your columns</h2></div><button class="btn small" onclick="closeModal()">✕</button></div>
+ <div class="notice"><strong>${escapeHtml(x.fileName)}</strong><div class="sub">${x.rows.length} data row${x.rows.length===1?'':'s'} detected. Only Product Name is required; unmapped optional fields use sensible defaults.</div></div>
+ <div class="formgrid section">${PRODUCT_IMPORT_FIELDS.map(f=>importMapSelect(f,x.headers,x.mapping)).join("")}</div>
+ <div class="actions section"><button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="previewProductImport()">Validate & Preview</button></div>`);
+}
+function parseImportedNumber(raw,label,rowNum,errors){
+ const t=String(raw??"").trim(); if(t==="")return 0;
+ const cleaned=t.replace(/[$£€,%\s]/g,"").replace(/,/g,""); const n=Number(cleaned);
+ if(!Number.isFinite(n)){errors.push(`${label} is not a valid number`);return 0}
+ if(n<0){errors.push(`${label} cannot be negative`);return 0}
+ return n;
+}
+function previewProductImport(){
+ const x=productImportSession;if(!x)return;
+ const mapping={};PRODUCT_IMPORT_FIELDS.forEach(f=>mapping[f.key]=val(`map_${f.key}`));
+ if(mapping.name===""){alert("Map a column to Product Name before continuing.");return}
+ x.mapping=mapping;
+ const existingSkus=new Set(state.products.map(p=>String(p.sku||"").trim().toLowerCase()).filter(Boolean));
+ const seenSkus=new Set();
+ x.parsed=x.rows.map((r,idx)=>{
+  const get=k=>mapping[k]===""?"":(r[Number(mapping[k])]??""); const errors=[],warnings=[];
+  const name=String(get("name")).trim(), sku=String(get("sku")).trim();
+  if(!name)errors.push("Product Name is required");
+  const skuKey=sku.toLowerCase();
+  if(skuKey){if(seenSkus.has(skuKey))errors.push("Duplicate SKU appears more than once in this CSV");seenSkus.add(skuKey);if(existingSkus.has(skuKey))warnings.push("SKU already exists in MarketMate")}
+  else if(state.products.some(p=>normaliseHeader(p.name)===normaliseHeader(name)))warnings.push("A product with this name already exists and no SKU is supplied")
+  const product={name,sku,category:String(get("category")).trim(),price:parseImportedNumber(get("price"),"Selling Price",idx+2,errors),material:parseImportedNumber(get("material"),"Material Cost",idx+2,errors),labor:parseImportedNumber(get("labor"),"Labour Cost",idx+2,errors),packaging:parseImportedNumber(get("packaging"),"Packaging Cost",idx+2,errors),other:parseImportedNumber(get("other"),"Other Cost",idx+2,errors),stock:parseImportedNumber(get("stock"),"Opening Stock",idx+2,errors),threshold:mapping.threshold===""?Number(state.settings.lowStock||5):parseImportedNumber(get("threshold"),"Low Stock Threshold",idx+2,errors),active:true,notes:""};
+  return {row:idx+2,product,errors,warnings};
+ });
+ showProductImportPreview();
+}
+function showProductImportPreview(){
+ const x=productImportSession, parsed=x.parsed||[], bad=parsed.filter(r=>r.errors.length), warn=parsed.filter(r=>r.warnings.length&&!r.errors.length), ready=parsed.length-bad.length;
+ openModal(`<div class="sectionhead"><div><div class="eyebrow">CSV import · Step 2 of 2</div><h2>Review before importing</h2></div><button class="btn small" onclick="closeModal()">✕</button></div>
+ <div class="grid cols3"><div class="card compact kpi"><div class="label">Rows found</div><div class="value">${parsed.length}</div></div><div class="card compact kpi"><div class="label">Ready</div><div class="value">${ready}</div></div><div class="card compact kpi"><div class="label">Need attention</div><div class="value">${bad.length}</div></div></div>
+ ${bad.length?`<div class="notice section"><strong>${bad.length} row${bad.length===1?'':'s'} cannot be imported yet.</strong><div class="sub">Fix the source CSV and re-upload it. Valid rows can still be imported if you choose to continue.</div></div>`:""}
+ <div class="field section"><label>If a SKU already exists in MarketMate</label><select id="import_duplicate_mode"><option value="skip">Skip that CSV row</option><option value="update">Update the existing product from the CSV</option></select></div>
+ <div class="card section"><div class="tablewrap"><table><thead><tr><th>Row</th><th>Product</th><th>SKU</th><th>Stock</th><th>Status</th></tr></thead><tbody>${parsed.slice(0,15).map(r=>`<tr><td>${r.row}</td><td><strong>${escapeHtml(r.product.name||"—")}</strong></td><td>${escapeHtml(r.product.sku||"—")}</td><td>${r.product.stock}</td><td>${r.errors.length?`<span class="badge bad">${escapeHtml(r.errors.join("; "))}</span>`:r.warnings.length?`<span class="badge warn">${escapeHtml(r.warnings.join("; "))}</span>`:'<span class="badge good">Ready</span>'}</td></tr>`).join("")}</tbody></table></div>${parsed.length>15?`<div class="sub" style="padding-top:10px">Showing the first 15 rows of ${parsed.length}.</div>`:""}</div>
+ <div class="notice good section"><strong>Safety first</strong><div class="sub">MarketMate will download a full JSON safety backup immediately before it changes your product data.</div></div>
+ <div class="actions section"><button class="btn" onclick="showProductImportMapping()">Back to mapping</button><button class="btn primary" ${ready?"":"disabled"} onclick="commitProductImport()">Import ${ready} valid row${ready===1?'':'s'}</button></div>`);
+}
+function commitProductImport(){
+ const x=productImportSession;if(!x||!x.parsed)return;
+ const valid=x.parsed.filter(r=>!r.errors.length), mode=val("import_duplicate_mode")||"skip";
+ if(!valid.length)return alert("There are no valid rows to import.");
+ if(!confirm(`Import ${valid.length} valid product row${valid.length===1?'':'s'}?\n\nA full safety backup will download first.`))return;
+ quickBackup();
+ let added=0,updated=0,skipped=0;
+ valid.forEach(r=>{
+  const p=r.product, skuKey=String(p.sku||"").trim().toLowerCase();
+  const existing=skuKey?state.products.find(q=>String(q.sku||"").trim().toLowerCase()===skuKey):null;
+  if(existing){if(mode==="skip"){skipped++;return}Object.assign(existing,{...p,id:existing.id,notes:existing.notes||"",active:existing.active!==false});updated++;return}
+  state.products.push({...p,id:uid()});added++;
+ });
+ save();closeModal();productImportSession=null;toast(`Import complete · ${added} added${updated?`, ${updated} updated`:""}${skipped?`, ${skipped} skipped`:""}`);renderProducts();
+}
+$("#productImportInput").addEventListener("change",async e=>{
+ const f=e.target.files[0]; if(!f)return;
+ try{
+  const rows=parseCSV(await f.text()); if(rows.length<1)throw Error("The CSV is empty.");
+  const headers=rows[0].map(h=>String(h).trim()); if(!headers.some(Boolean))throw Error("No column headings were found.");
+  const dataRows=rows.slice(1).filter(r=>r.some(v=>String(v).trim()!=="")); if(!dataRows.length)throw Error("The CSV contains headings but no product rows.");
+  productImportSession={fileName:f.name,headers,rows:dataRows,mapping:autoMapHeaders(headers),parsed:null};showProductImportMapping();
+ }catch(err){alert("Import could not start: "+err.message)}
+ e.target.value="";
+});
+
+function renderInventory(){
+ const e=nextEvent();
+ pageTitle("Inventory","What do you need to make or restock?");
+ if(!state.products.length){$("#view").innerHTML=`<div class="card empty"><span class="emptyicon">▦</span><h2>No products to plan yet</h2><p>Add products first, then allocate what you want to take to each market.</p><button class="btn primary" onclick="openProduct()">Add product</button></div>`;return}
+ $("#view").innerHTML=`<div class="notice ${e?'good':''}"><strong>${e?`Planning for ${e.name}`:"No upcoming event"}</strong><div class="sub">${e?`${dateText(e.date)} · Set planned and packed quantities below.`:"Add an upcoming event to create an event stock plan."}</div></div>
+ <div class="card section"><div class="tablewrap"><table><thead><tr><th>Product</th><th>On hand</th><th>Planned</th><th>Packed</th><th>Still to make</th><th>Adjust stock</th></tr></thead><tbody>
+ ${state.products.map(p=>{let a=e?state.allocations.find(x=>x.eventId===e.id&&x.productId===p.id):null;let planned=a?.planned||0,packed=a?.packed||0;let make=Math.max(0,planned-p.stock);return `<tr><td><strong>${p.name}</strong><div class="sub">${p.category||""}</div></td><td><strong>${p.stock}</strong>${p.stock<=p.threshold?' <span class="badge warn">Low</span>':''}</td><td><input style="width:78px" type="number" min="0" value="${planned}" ${!e?'disabled':''} onchange="setAlloc('${e?.id||""}','${p.id}','planned',this.value)"></td><td><input style="width:78px" type="number" min="0" value="${packed}" ${!e?'disabled':''} onchange="setAlloc('${e?.id||""}','${p.id}','packed',this.value)"></td><td>${make?`<span class="badge warn">${make}</span>`:'<span class="badge good">Ready</span>'}</td><td><button class="btn small" onclick="adjustStock('${p.id}',1)">+1</button> <button class="btn small" onclick="adjustStock('${p.id}',-1)">−1</button></td></tr>`}).join("")}
+ </tbody></table></div></div>`;
+}
+function setAlloc(eventId,productId,key,v){if(!eventId)return;let a=state.allocations.find(x=>x.eventId===eventId&&x.productId===productId);if(!a){a={eventId,productId,planned:0,packed:0};state.allocations.push(a)}a[key]=Number(v||0);save()}
+function adjustStock(id,d){let p=productBy(id);p.stock=Math.max(0,Number(p.stock)+d);save();renderInventory()}
+
+let cart=[];
+function renderMarket(){
+ const active=nextEvent(); pageTitle("Market Mode","Fast sales recording while customers are waiting");
+ if(!active){$("#view").innerHTML='<div class="card empty"><span class="emptyicon">●</span><h2>No active market</h2><p>Add or confirm an upcoming event before opening Market Mode.</p><button class="btn primary" onclick="openEvent()">Add event</button></div>';return}
+ const cats=["All",...new Set(state.products.map(p=>p.category).filter(Boolean))], selected=window.mmCat||"All";
+ const products=state.products.filter(p=>selected==="All"||p.category===selected);
+ const cartUnits=cart.reduce((a,x)=>a+x.qty,0), cartTotal=cart.reduce((a,x)=>a+x.qty*(productBy(x.productId)?.price||0),0);
+ const todayRev=revenueEvent(active.id), target=Number(active.target||0), targetPct=target?Math.min(100,Math.round(todayRev/target*100)):0;
+ $("#view").innerHTML=`<div class="market">
+ <div class="toolbar"><div><div class="eyebrow" style="color:#a9c2b8">Active market</div><h2>${active.name}</h2><div class="sub" style="color:#a9c2b8">${dateText(active.date)} · Tap a product to add it to the sale</div></div><div class="marketstats"><div class="marketstat"><strong>${money(todayRev)}</strong><small>Revenue</small></div><div class="marketstat"><strong>${targetPct}%</strong><small>of target</small></div><button class="btn small" onclick="undoLastSale('${active.id}')">Undo last</button></div></div>
+ <div class="categorybar">${cats.map(c=>`<button class="${c===selected?'active':''}" onclick="window.mmCat='${c}';renderMarket()">${c}</button>`).join("")}</div>
+ <div class="productsgrid">${products.length?products.map(p=>{const av=eventAvailable(active.id,p.id),inc=cart.find(c=>c.productId===p.id)?.qty||0;return `<button class="producttile" ${av<=0?'disabled':''} onclick="addCart('${p.id}')"><span class="stock">${av} left</span><strong>${p.name}</strong><div class="sub">${p.category||p.sku||"Product"}</div><div class="price">${money(p.price)}</div>${inc?`<span class="cartqty">${inc}</span>`:""}</button>`}).join(""):'<div class="empty" style="color:#bcd0c7;grid-column:1/-1">No products in this category.</div>'}</div>
+ <div class="section"><div class="sectionhead"><h2 style="color:white">Recent sales</h2><span class="badge dark">${salesForEvent(active.id).length} lines</span></div>${salesForEvent(active.id).slice(-4).reverse().map(s=>`<div class="row" style="border-color:#315046"><span>${productBy(s.productId)?.name||"Product"} × ${s.qty}<span class="tiny" style="color:#9eb8ad"> · ${s.payment}</span></span><strong>${money(s.qty*s.price-s.discount)}</strong></div>`).join("")||'<div class="sub" style="color:#adc4ba;padding:12px 0">No sales recorded yet.</div>'}</div>
+ <div class="salefooter"><div><div class="eyebrow" style="color:#a9c2b8">Current sale</div><strong style="font-size:18px">${cartUnits} item${cartUnits===1?'':'s'} · ${money(cartTotal)}</strong></div><div class="actions"><button class="btn" ${!cart.length?'disabled':''} onclick="cart=[];renderMarket()">Clear</button><button class="btn accent" ${!cart.length?'disabled':''} onclick="checkout()">Complete sale</button></div></div>
+ </div>`;
+}
+function addCart(id){
+ const e=nextEvent(); if(!e)return;
+ const available=eventAvailable(e.id,id), existing=cart.find(c=>c.productId===id), inCart=existing?.qty||0;
+ if(inCart>=available){alert("No more of this product is available for this event.");return}
+ if(existing)existing.qty++;else cart.push({productId:id,qty:1});renderMarket()
+}
+function undoLastSale(eventId){
+ const list=salesForEvent(eventId).slice().sort((a,b)=>b.date.localeCompare(a.date)); const s=list[0];
+ if(!s){alert("There is no sale to undo.");return}
+ if(!confirm(`Undo the last sale: ${productBy(s.productId)?.name||"product"} × ${s.qty}?`))return;
+ const p=productBy(s.productId); if(p)p.stock=Number(p.stock||0)+Number(s.qty||0);
+ state.sales=state.sales.filter(x=>x.id!==s.id); save(); toast("Last sale undone"); renderMarket();
+}
+function checkout(){
+ const e=nextEvent(); if(!cart.length)return alert("Add at least one product.");
+ openModal(`<div class="sectionhead"><h2>Complete sale</h2><button class="btn small" onclick="closeModal()">✕</button></div>
+ <div class="list">${cart.map(x=>`<div class="row"><span>${productBy(x.productId).name} × ${x.qty}</span><strong>${money(productBy(x.productId).price*x.qty)}</strong></div>`).join("")}</div>
+ <div class="field section"><label>Payment type</label><select id="paytype"><option>Card</option><option>Cash</option><option>Other</option></select></div>
+ <div class="field section"><label>Total discount</label><input id="discount" type="number" value="0"></div>
+ <button class="btn accent section" style="width:100%" onclick="finishSale('${e.id}')">Record ${money(cart.reduce((a,x)=>a+x.qty*productBy(x.productId).price,0))}</button>`);
+}
+function finishSale(eventId){
+ for(const x of cart){if(x.qty>eventAvailable(eventId,x.productId)){alert(`${productBy(x.productId)?.name||"Product"} no longer has enough available stock. Please adjust the sale.`);closeModal();renderMarket();return}}
+ const discount=Math.max(0,num("discount")), pay=val("paytype"), subtotal=cart.reduce((a,x)=>a+x.qty*productBy(x.productId).price,0);
+ if(discount>subtotal){alert("Discount cannot exceed the sale subtotal.");return}
+ cart.forEach(x=>{let p=productBy(x.productId);const lineSubtotal=x.qty*p.price;const lineDiscount=subtotal?discount*(lineSubtotal/subtotal):0;state.sales.push({id:uid(),eventId,productId:x.productId,qty:x.qty,price:p.price,discount:lineDiscount,payment:pay,date:new Date().toISOString()});p.stock=Math.max(0,p.stock-x.qty)});
+ cart=[];save();closeModal();toast("Sale recorded");renderMarket()
+}
+
+function renderSales(){
+ pageTitle("Sales","What did you sell?");
+ $("#view").innerHTML=`<div class="actions section"><span class="demo-chip">CSV export available in full version</span><button class="btn" onclick="navTo('market')">Open Market Mode</button></div>
+ <div class="card section"><table><thead><tr><th>Date</th><th>Event</th><th>Product</th><th>Qty</th><th>Payment</th><th>Total</th><th></th></tr></thead><tbody>
+ ${state.sales.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(s=>`<tr><td>${new Date(s.date).toLocaleString("en-AU")}</td><td>${eventBy(s.eventId)?.name||"—"}</td><td>${productBy(s.productId)?.name||"—"}</td><td>${s.qty}</td><td>${s.payment}</td><td>${money(s.qty*s.price-s.discount)}</td><td><button class="btn small danger" onclick="deleteSale('${s.id}')">Delete</button></td></tr>`).join("")}
+ </tbody></table></div>`;
+}
+function deleteSale(id){let s=state.sales.find(x=>x.id===id);if(confirm("Delete this sale and return its quantity to stock?")){let p=productBy(s.productId);if(p)p.stock+=Number(s.qty);state.sales=state.sales.filter(x=>x.id!==id);save();renderSales()}}
+
+function renderInsights(){
+ pageTitle("Insights","What's working?");
+ const completed=state.events.filter(e=>e.status==="Completed");
+ const best=completed.slice().sort((a,b)=>profitEvent(b.id)-profitEvent(a.id))[0];
+ const prodPerf=state.products.map(p=>({p,rev:state.sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+s.qty*s.price-s.discount,0),units:state.sales.filter(s=>s.productId===p.id).reduce((a,s)=>a+s.qty,0)})).sort((a,b)=>b.rev-a.rev);
+ const maxRev=Math.max(1,...completed.map(e=>revenueEvent(e.id)));
+ $("#view").innerHTML=`
+ <div class="grid cols4">
+ ${kpi("Best Market",best?.name||"—",best?money(profitEvent(best.id))+" profit":"")}
+ ${kpi("Most Profitable Product",prodPerf[0]?.p.name||"—",prodPerf[0]?money(prodPerf[0].rev)+" revenue":"")}
+ ${kpi("Average Event Profit",completed.length?money(completed.reduce((a,e)=>a+profitEvent(e.id),0)/completed.length):"—","Completed events")}
+ ${kpi("Average Sell-through",completed.length?Math.round(completed.reduce((a,e)=>a+sellThrough(e.id),0)/completed.length)+"%":"—","Completed events")}
+ </div>
+ <div class="grid cols2 section">
+  <div class="card"><h2>Revenue by event</h2><div class="section">${completed.map(e=>`<div style="margin:12px 0"><div class="sectionhead"><span>${e.name}</span><strong>${money(revenueEvent(e.id))}</strong></div><div class="bar"><span style="width:${revenueEvent(e.id)/maxRev*100}%"></span></div></div>`).join("")}</div></div>
+  <div class="card"><h2>Top products</h2>${prodPerf.map(x=>`<div class="row"><div><strong>${x.p.name}</strong><span class="sub">${x.units} units sold</span></div><strong>${money(x.rev)}</strong></div>`).join("")}</div>
+ </div>
+ <div class="card section"><div class="sectionhead"><h2>What should I bring?</h2><span class="badge">Transparent suggestion</span></div>
+ <div class="sub">Suggestion = average units sold across completed events × 1.20 buffer, rounded up.</div>
+ <table class="section"><thead><tr><th>Product</th><th>Avg sold</th><th>Suggested qty</th><th>Why</th></tr></thead><tbody>
+ ${state.products.map(p=>{let vals=completed.map(e=>unitsSold(e.id,p.id));let avg=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;let sug=Math.ceil(avg*1.2);return `<tr><td>${p.name}</td><td>${avg.toFixed(1)}</td><td><strong>${sug}</strong></td><td>20% buffer on historical average</td></tr>`}).join("")}
+ </tbody></table></div>`;
+}
+
+function renderBackup(){
+ pageTitle("Demo & Full Version","This sandbox does not export or restore data");
+ $("#view").innerHTML=`
+ <div class="notice"><strong>Demo protection is active.</strong><div class="sub">This hosted edition uses disposable sample data. Backup, restore, CSV import and CSV export are intentionally disabled here.</div></div>
+ <div class="grid cols2 section">
+  <div class="card"><h2>Full version: Backup & Restore</h2><p class="muted">The purchased version exports products, events, inventory allocations, sales, expenses, tasks and settings into one portable JSON backup. Restore validates the file before replacing local data.</p><div class="demo-chip">Demo preview only</div></div>
+  <div class="card"><h2>Full version: CSV tools</h2><p class="muted">Import product lists with field mapping and validation, then export products, sales and expenses to CSV when you need them outside MarketMate.</p><div class="demo-chip">Demo preview only</div></div>
+ </div>
+ <div class="grid cols2 section">
+  <div class="card"><h2>Reset this sandbox</h2><p class="muted">Changed or deleted the sample data? Restore the original Willow & Field Studio demo instantly.</p><button class="btn" onclick="resetDemo()">Reset Demo Data</button></div>
+  <div class="card demo-cta-card"><h2>Want your own workspace?</h2><p class="muted">The full MarketMate download removes demo limits and enables backup, restore, CSV import and exports.</p><a class="btn" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get the full version →</a></div>
+ </div>`;
+}
+function quickBackup(){demoBlocked("Backup is disabled in the hosted demo. It is included in the full version.")}
+$("#restoreInput").addEventListener("change",async e=>{
+ if(DEMO_MODE){e.target.value="";demoBlocked("Restore is disabled in the hosted demo.");return}
+ const f=e.target.files[0]; if(!f)return;
+ try{
+  const parsed=JSON.parse(await f.text());
+  if(parsed.app!=="MarketMate"||!parsed.data||!Array.isArray(parsed.data.products)||!Array.isArray(parsed.data.events))throw Error("Not a valid MarketMate backup");
+  const d=parsed.data;
+  const summary=`${d.events.length} events, ${d.products.length} products, ${d.sales?.length||0} sales records`;
+  if(confirm(`Restore this backup?\n\n${summary}\n\nCurrent data will be replaced.`)){
+    quickBackup(); state=d; save(); alert("Restore complete."); render();
+  }
+ }catch(err){alert("Restore failed: "+err.message)}
+ e.target.value="";
+});
+function exportCSV(type){
+ let rows=[];
+ if(type==="products") rows=[["Product Name","SKU","Category","Selling Price","Material Cost","Labour Cost","Packaging Cost","Other Cost","Opening Stock","Low Stock Threshold"],...state.products.map(p=>[p.name,p.sku,p.category,p.price,p.material,p.labor,p.packaging,p.other,p.stock,p.threshold])];
+ if(type==="sales") rows=[["Date","Event","Product","Qty","Price","Discount","Payment","Total"],...state.sales.map(s=>[s.date,eventBy(s.eventId)?.name||"",productBy(s.productId)?.name||"",s.qty,s.price,s.discount,s.payment,s.qty*s.price-s.discount])];
+ if(type==="expenses") rows=[["Date","Event","Type","Amount"],...state.expenses.map(x=>[x.date,eventBy(x.eventId)?.name||"",x.type,x.amount])];
+ const csv=rows.map(r=>r.map(v=>`"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");
+ download(`marketmate-${type}-${new Date().toISOString().slice(0,10)}.csv`,csv,"text/csv");
+}
+function download(name,text,type){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+
+function renderSettings(){
+ pageTitle("Settings","Make MarketMate yours");
+ $("#view").innerHTML=`<div class="card"><div class="formgrid">
+ ${field("Business / shop name","set_business",state.settings.business)}<div class="field"><label>Currency</label><select id="set_currency"><option ${state.settings.currency==="AUD"?"selected":""}>AUD</option><option ${state.settings.currency==="USD"?"selected":""}>USD</option><option ${state.settings.currency==="GBP"?"selected":""}>GBP</option><option ${state.settings.currency==="EUR"?"selected":""}>EUR</option></select></div>
+ ${field("Default low-stock threshold","set_low",state.settings.lowStock,"number")}
+ </div><div class="actions section"><button class="btn primary" onclick="saveSettings()">Save settings</button><button class="btn" onclick="showWelcome()">About the demo</button></div></div>
+ <div class="card section"><h2>About MarketMate</h2>
+ <div class="statline"><span>Version</span><strong>Hosted demo</strong></div>
+ <div class="statline"><span>Storage</span><strong>Session-only demo storage</strong></div>
+ <div class="statline"><span>Account required</span><strong>No</strong></div>
+ <div class="statline"><span>Subscription required</span><strong>No</strong></div>
+ <p class="muted" style="margin-top:16px">This is a disposable evaluation sandbox using sample data. Do not enter real business or personal information. The full purchased version uses your own persistent local workspace.</p>
+ </div>`;
+}
+function saveSettings(){state.settings.business=val("set_business");state.settings.currency=val("set_currency");state.settings.lowStock=num("set_low");save();toast("Settings saved");renderSettings()}
+
+function renderHelp(){
+ pageTitle("Help","Demo guide");
+ $("#view").innerHTML=`<div class="grid cols2">
+ <div class="card"><h2>1. Set up products</h2><p class="muted">Add products manually, or import an existing product list from CSV using field mapping and a validation preview.</p></div>
+ <div class="card"><h2>2. Add an event</h2><p class="muted">Create your next market and set fees, costs and revenue target.</p></div>
+ <div class="card"><h2>3. Plan inventory</h2><p class="muted">Set planned and packed quantities for the next market.</p></div>
+ <div class="card"><h2>4. Use Market Mode</h2><p class="muted">Tap products as they sell. MarketMate records the sale and reduces local stock.</p></div>
+ </div>
+ <div class="card section"><h2>CSV import in the full version</h2><p class="muted">The purchased version imports CSV product lists and opening stock with column mapping and a validation preview. Import and export are intentionally disabled in this public demo.</p></div>
+ <div class="card section"><h2>This demo is disposable</h2><p class="muted">The hosted demo uses isolated sample data in your browser session. Do not enter real business or personal information here. Use Reset Demo at any time to restore the sample business.</p></div>
+ <div class="card section"><h2>Compatibility</h2><p class="muted">MarketMate is designed for current desktop versions of Chrome, Edge, Firefox and Safari. Because the app stores working data in the browser, use a normal browser window rather than private/incognito browsing. Mobile and tablet layouts are provided, but desktop or tablet is recommended for setup and reporting.</p></div>
+ <div class="card section"><h2>Demo edition</h2><p class="muted">This public edition exists only so you can evaluate MarketMate before buying. The purchased download provides your own unrestricted local workspace and production data tools.</p></div>
+ <div class="card section"><h2>Important</h2><p class="muted">MarketMate is a planning and record-keeping tool. It does not process payments and is not accounting, tax, legal or financial advice. Always review your own figures before making business decisions.</p></div>`;
+}
+
+function showWelcome(){
+ openModal(`<div class="welcome">
+  <div class="welcomehero"><div><div class="eyebrow" style="color:#afc7bd">MarketMate hosted demo</div><h2>Try the workflow.<br>Keep your real data out.</h2><p>This sandbox is preloaded with a fictional maker business so you can explore events, inventory, Market Mode, sales and insights before buying.</p></div><div class="welcomemark">M</div></div>
+  <div class="datacallout"><div class="lock">◎</div><div><strong>Disposable sample workspace</strong><div class="sub">Changes stay inside this browser session and are not shared with other visitors. Do not enter real personal or business information.</div></div></div>
+  <div class="grid cols2 section"><div class="card"><h3>Available to try</h3><p class="muted">Dashboard, events, products, inventory planning, Market Mode, sales and insights.</p></div><div class="card"><h3>Disabled in demo</h3><p class="muted">Backup/restore, CSV import/export and a permanent fresh workspace.</p></div></div>
+  <div class="actions section"><button class="btn primary" onclick="chooseDemo()">Explore MarketMate</button><a class="btn" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get full version</a></div>
+ </div>`);
+}
+function chooseDemo(){state.settings.onboardingComplete=true;save();closeModal();showQuickStart(true)}
+function startFresh(){demoBlocked("A permanent fresh workspace is available in the full downloaded version.")}
+function finishFreshSetup(){state.settings.business=val("ob_business")||"My Market Business";state.settings.currency=val("ob_currency")||"AUD";state.settings.onboardingComplete=true;save();closeModal();render();showQuickStart(true)}
+function showQuickStart(firstRun=false){
+ openModal(`<div class="welcome"><div class="sectionhead"><div><div class="eyebrow">${firstRun?"You’re ready":"Quick start"}</div><h2>Four steps to your first useful market report</h2></div><button class="btn small" onclick="closeModal()">✕</button></div>
+  <div class="tourstep"><div class="num">1</div><div><strong>Add your products</strong><p>Enter selling price, costs and stock. MarketMate uses these numbers for margin and profitability.</p></div></div>
+  <div class="tourstep"><div class="num">2</div><div><strong>Create your next event</strong><p>Add stall fees, travel costs and a revenue target, then plan what stock you want to take.</p></div></div>
+  <div class="tourstep"><div class="num">3</div><div><strong>Use Market Mode on the day</strong><p>Tap product tiles as items sell. Stock and event revenue update immediately — no spreadsheet rows while customers wait.</p></div></div>
+  <div class="tourstep"><div class="num">4</div><div><strong>Review the results</strong><p>Use Insights to compare profit, sell-through and product performance. Backup and export are enabled in the full downloaded version.</p></div></div>
+  <div class="datacallout"><div class="lock">◎</div><div><strong>Demo sandbox</strong><div class="sub">This public demo uses sample data only. Changes are stored for this browser session and are disposable.</div></div></div>
+  <div class="actions section"><button class="btn primary" onclick="closeModal();navTo('dashboard')">Go to Dashboard</button><button class="btn" onclick="closeModal();navTo('market')">See Market Mode</button></div></div>`)
+}
+function resetDemo(){if(confirm("Reset this demo back to the original sample data?")){state=demoData();state.settings.onboardingComplete=true;save();toast("Demo reset");render()}}
+function field(label,id,value,type="text"){return `<div class="field"><label>${label}</label><input id="${id}" type="${type}" value="${String(value??"").replaceAll('"','&quot;')}"></div>`}
+function val(id){return document.getElementById(id)?.value||""}
+function num(id){return Number(val(id)||0)}
+function openModal(html){$("#modal").innerHTML=html;$("#modalBack").classList.add("show")}
+function closeModal(){$("#modalBack").classList.remove("show")}
+$("#modalBack").addEventListener("click",e=>{if(e.target.id==="modalBack")closeModal()})
+
+function demoBlocked(message){
+  openModal(`<div class="welcome"><div class="sectionhead"><div><div class="eyebrow">Hosted demo</div><h2>Available in the full version</h2></div><button class="btn small" onclick="closeModal()">✕</button></div><p class="muted section">${escapeHtml(message||"This feature is disabled in the public demo.")}</p><div class="actions section"><a class="btn primary" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get the full version →</a><button class="btn" onclick="closeModal()">Keep exploring</button></div></div>`);
+}
+const __demoSaveProduct=saveProduct;
+saveProduct=function(id){if(!id&&state.products.length>=DEMO_PRODUCT_LIMIT){demoBlocked(`The hosted demo is limited to ${DEMO_PRODUCT_LIMIT} products. Edit or delete a sample product, or use the full version for your own catalogue.`);return}return __demoSaveProduct(id)};
+const __demoSaveEvent=saveEvent;
+saveEvent=function(id){if(!id&&state.events.length>=DEMO_EVENT_LIMIT){demoBlocked(`The hosted demo is limited to ${DEMO_EVENT_LIMIT} events. Edit or delete a sample event, or use the full version for unlimited event planning.`);return}return __demoSaveEvent(id)};
+const __demoDuplicateEvent=duplicateEvent;
+duplicateEvent=function(id){if(state.events.length>=DEMO_EVENT_LIMIT){demoBlocked(`The hosted demo is limited to ${DEMO_EVENT_LIMIT} events.`);return}return __demoDuplicateEvent(id)};
+downloadProductTemplate=function(){demoBlocked("CSV template download is disabled in the public demo. The template is included with the purchased download.")};
+beginProductImport=function(){demoBlocked("CSV product import is disabled in the public demo. The full version includes mapping, validation and duplicate handling.")};
+exportCSV=function(){demoBlocked("CSV exports are disabled in the public demo and enabled in the full downloaded version.")};
+quickBackup=function(){demoBlocked("Full JSON backup is disabled in the public demo and enabled in the full downloaded version.")};
+
+function render(){
+ renderNav();
+ const p=current();
+ const map={dashboard:renderDashboard,events:renderEvents,products:renderProducts,inventory:renderInventory,market:renderMarket,sales:renderSales,insights:renderInsights,backup:renderBackup,settings:renderSettings,help:renderHelp};
+ (map[p]||renderDashboard)();
+}
+window.addEventListener("hashchange",render);
+if(!sessionStorage.getItem(KEY)){state=demoData();state.settings.onboardingComplete=false;save()}
+render();
+if(!state.settings?.onboardingComplete) setTimeout(showWelcome,120);
+</script>
+</body>
+</html>
