@@ -300,7 +300,7 @@ h2{font-size:23px;letter-spacing:-.035em}
 <body>
 <div class="demo-ribbon" role="status">
   <strong>MARKETMATE DEMO</strong><span>Sample data • disposable sandbox • exports disabled</span>
-  <div class="demo-actions"><button onclick="resetDemo()">Reset demo</button><a href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get full version</a></div>
+  <div class="demo-actions"><button onclick="resetDemo()">Reset demo</button><a href="#" data-purchase-link onclick="return openPurchase(event)">Get full version</a></div>
 </div>
 
 <div class="app">
@@ -383,6 +383,16 @@ function save(){sessionStorage.setItem(KEY,JSON.stringify(state))}
 function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.__toastTimer);window.__toastTimer=setTimeout(()=>t.classList.remove("show"),2200)}
 function toggleMenu(){$("#sidebar").classList.toggle("open")}
 function navTo(page){location.hash=page; render(); $("#sidebar").classList.remove("open")}
+// Purchase link configuration. Paste the live Etsy listing URL here once published.
+const PURCHASE_URL = "https://www.etsy.com/au/listing/4583941352/craft-fair-vendor-app-inventory-sales";
+function openPurchase(event){
+  if(event) event.preventDefault();
+  if(PURCHASE_URL){ window.open(PURCHASE_URL, "_blank", "noopener,noreferrer"); return false; }
+  if(typeof toast === "function") toast("Available on Etsy soon");
+  else alert("MarketMate will be available on Etsy soon.");
+  return false;
+}
+
 const navItems=[["dashboard","⌂","Dashboard"],["events","◫","Events"],["products","◇","Products"],["inventory","▦","Inventory"],["market","●","Market Mode"],["sales","↗","Sales"],["insights","⌁","Insights"],["sep","",""] ,["backup","↧","Demo & Full Version"],["settings","⚙","Settings"],["help","?","Help"]];
 function renderNav(){
  $("#nav").innerHTML=navItems.map(([id,ico,label])=>id==="sep"?'<div class="sep"></div>':`<button class="${current()===id?'active':''}" onclick="navTo('${id}')"><span class="ico">${ico}</span><span>${label}</span></button>`).join("");
@@ -785,7 +795,7 @@ function renderBackup(){
  </div>
  <div class="grid cols2 section">
   <div class="card"><h2>Reset this sandbox</h2><p class="muted">Changed or deleted the sample data? Restore the original Willow & Field Studio demo instantly.</p><button class="btn" onclick="resetDemo()">Reset Demo Data</button></div>
-  <div class="card demo-cta-card"><h2>Want your own workspace?</h2><p class="muted">The full MarketMate download removes demo limits and enables backup, restore, CSV import and exports.</p><a class="btn" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get the full version →</a></div>
+  <div class="card demo-cta-card"><h2>Want your own workspace?</h2><p class="muted">The full MarketMate download removes demo limits and enables backup, restore, CSV import and exports.</p><a class="btn" href="#" data-purchase-link onclick="return openPurchase(event)">Get the full version →</a></div>
  </div>`;
 }
 function quickBackup(){demoBlocked("Backup is disabled in the hosted demo. It is included in the full version.")}
@@ -849,7 +859,7 @@ function showWelcome(){
   <div class="welcomehero"><div><div class="eyebrow" style="color:#afc7bd">MarketMate hosted demo</div><h2>Try the workflow.<br>Keep your real data out.</h2><p>This sandbox is preloaded with a fictional maker business so you can explore events, inventory, Market Mode, sales and insights before buying.</p></div><div class="welcomemark">M</div></div>
   <div class="datacallout"><div class="lock">◎</div><div><strong>Disposable sample workspace</strong><div class="sub">Changes stay inside this browser session and are not shared with other visitors. Do not enter real personal or business information.</div></div></div>
   <div class="grid cols2 section"><div class="card"><h3>Available to try</h3><p class="muted">Dashboard, events, products, inventory planning, Market Mode, sales and insights.</p></div><div class="card"><h3>Disabled in demo</h3><p class="muted">Backup/restore, CSV import/export and a permanent fresh workspace.</p></div></div>
-  <div class="actions section"><button class="btn primary" onclick="chooseDemo()">Explore MarketMate</button><a class="btn" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get full version</a></div>
+  <div class="actions section"><button class="btn primary" onclick="chooseDemo()">Explore MarketMate</button><a class="btn" href="#" data-purchase-link onclick="return openPurchase(event)">Get full version</a></div>
  </div>`);
 }
 function chooseDemo(){state.settings.onboardingComplete=true;save();closeModal();showQuickStart(true)}
@@ -873,7 +883,7 @@ function closeModal(){$("#modalBack").classList.remove("show")}
 $("#modalBack").addEventListener("click",e=>{if(e.target.id==="modalBack")closeModal()})
 
 function demoBlocked(message){
-  openModal(`<div class="welcome"><div class="sectionhead"><div><div class="eyebrow">Hosted demo</div><h2>Available in the full version</h2></div><button class="btn small" onclick="closeModal()">✕</button></div><p class="muted section">${escapeHtml(message||"This feature is disabled in the public demo.")}</p><div class="actions section"><a class="btn primary" href="https://www.etsy.com/listing/REPLACE-WITH-LISTING-ID" target="_blank" rel="noopener noreferrer">Get the full version →</a><button class="btn" onclick="closeModal()">Keep exploring</button></div></div>`);
+  openModal(`<div class="welcome"><div class="sectionhead"><div><div class="eyebrow">Hosted demo</div><h2>Available in the full version</h2></div><button class="btn small" onclick="closeModal()">✕</button></div><p class="muted section">${escapeHtml(message||"This feature is disabled in the public demo.")}</p><div class="actions section"><a class="btn primary" href="#" data-purchase-link onclick="return openPurchase(event)">Get the full version →</a><button class="btn" onclick="closeModal()">Keep exploring</button></div></div>`);
 }
 const __demoSaveProduct=saveProduct;
 saveProduct=function(id){if(!id&&state.products.length>=DEMO_PRODUCT_LIMIT){demoBlocked(`The hosted demo is limited to ${DEMO_PRODUCT_LIMIT} products. Edit or delete a sample product, or use the full version for your own catalogue.`);return}return __demoSaveProduct(id)};
@@ -886,11 +896,21 @@ beginProductImport=function(){demoBlocked("CSV product import is disabled in the
 exportCSV=function(){demoBlocked("CSV exports are disabled in the public demo and enabled in the full downloaded version.")};
 quickBackup=function(){demoBlocked("Full JSON backup is disabled in the public demo and enabled in the full downloaded version.")};
 
+
+function refreshPurchaseLinks(){
+  document.querySelectorAll('[data-purchase-link]').forEach(el=>{
+    if(!el.dataset.originalText) el.dataset.originalText=el.textContent;
+    el.textContent = PURCHASE_URL ? el.dataset.originalText : "Available on Etsy soon";
+    el.setAttribute('aria-disabled', PURCHASE_URL ? 'false' : 'true');
+  });
+}
+
 function render(){
  renderNav();
  const p=current();
  const map={dashboard:renderDashboard,events:renderEvents,products:renderProducts,inventory:renderInventory,market:renderMarket,sales:renderSales,insights:renderInsights,backup:renderBackup,settings:renderSettings,help:renderHelp};
  (map[p]||renderDashboard)();
+ setTimeout(refreshPurchaseLinks,0);
 }
 window.addEventListener("hashchange",render);
 if(!sessionStorage.getItem(KEY)){state=demoData();state.settings.onboardingComplete=false;save()}
